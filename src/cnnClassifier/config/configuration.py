@@ -1,10 +1,14 @@
-from src.cnnClassifier.constants import *
-from src.cnnClassifier.entity.config_entity import (DataIngestionConfig, PrepareBaseModelConfig,
-                                                    PrepareCallbacksConfig, TrainingConfig)
+from cnnClassifier.constants import *
 import os
-
-from cnnClassifier.constants import CONFIG_FILE_PATH, PARAMS_FILE_PATH
+from pathlib import Path
 from cnnClassifier.utils.common import read_yaml, create_directories
+from cnnClassifier.entity.config_entity import (DataIngestionConfig,
+                                                PrepareBaseModelConfig,
+                                                PrepareCallbacksConfig,
+                                                TrainingConfig,
+                                                EvaluationConfig)
+
+
 
 class ConfigurationManager:
     def __init__(
@@ -33,6 +37,9 @@ class ConfigurationManager:
 
         return data_ingestion_config
     
+
+
+    
     def get_prepare_base_model_config(self) -> PrepareBaseModelConfig:
         config = self.config.prepare_base_model
         
@@ -51,9 +58,8 @@ class ConfigurationManager:
 
         return prepare_base_model_config
     
-    
-    
-    
+
+
     def get_prepare_callback_config(self) -> PrepareCallbacksConfig:
         config = self.config.prepare_callbacks
         model_ckpt_dir = os.path.dirname(config.checkpoint_model_filepath)
@@ -68,10 +74,10 @@ class ConfigurationManager:
             checkpoint_model_filepath=Path(config.checkpoint_model_filepath)
         )
 
-        return prepare_callback_config    
+        return prepare_callback_config
     
 
-    
+
     def get_training_config(self) -> TrainingConfig:
         training = self.config.training
         prepare_base_model = self.config.prepare_base_model
@@ -94,3 +100,17 @@ class ConfigurationManager:
 
         return training_config
     
+
+
+
+    def get_validation_config(self) -> EvaluationConfig:
+        eval_config = EvaluationConfig(
+            path_of_model=Path("artifacts/training/model.keras"),
+            training_data=Path("artifacts/data_ingestion/Chicken-fecal-images"),
+            all_params=self.params,
+            params_image_size=self.params.IMAGE_SIZE,
+            params_batch_size=self.params.BATCH_SIZE
+        )
+        return eval_config
+
+      
